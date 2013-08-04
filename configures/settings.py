@@ -108,6 +108,7 @@ ROOT_URLCONF = 'configures.urls'
 WSGI_APPLICATION = 'configures.wsgi.application'
 
 TEMPLATE_DIRS = (
+    "/usr/local/src/www/ou_fyp/templates",
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
