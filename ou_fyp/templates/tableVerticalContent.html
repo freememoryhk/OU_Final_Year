@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "tableInclude.html"%}
+<table id="VerticalContentTableStyle">
+<colgroup>
+    <col span="1" class="firstCol"/>
+</colgroup>
+<thead>
+    <tr>
+        <th>
+            {{name}}
+        </th>
+        <th>
+            <div id="id_status"></div>
+        </th>
+    </tr>
+</thead>
+<tbody>
+{% block tableContent %}
+{% endblock %}
+</tbody>
+</table>
+{% endblock %}

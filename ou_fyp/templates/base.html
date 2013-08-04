@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>
+            {% block title %}{{title}}{% endblock %}
+        </title>
+        {% include "baseInclude.html"%}
+    </head>
+    <body>
+        {% include "navigations.html"%}
+        {% block content%}
+        {% endblock %}
+    </body>
+</html>

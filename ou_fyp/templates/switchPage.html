@@ -1,0 +1,35 @@
+<script>
+    function switch_page(event)
+    {
+        page = $("#id_switch_page").val();
+        if (event !== undefined)
+        {
+            event.preventDefault();
+            page = event.target.value;
+        }
+        request = $.ajax({url:"{{submitLink}}",data:{page:page,responseFormat:"html"},datatype:"html"});
+        request.done(
+        function(data)
+        {
+            container = $("#id_table_body");
+            container.empty();
+            {%block addToTable%}
+            {%endblock%}
+            container.append(data);
+        }
+        );
+    }
+    $(document).ready
+    (
+        function()
+        {
+            $("#id_switch_page").change(switch_page);
+        }
+    );
+</script>
+<select id="id_switch_page">
+    {%load get_range%}
+    {%for page in totalPage|get_range%}
+        <option value='{{page}}'>{{page}}</option>
+    {%endfor%}
+</select>

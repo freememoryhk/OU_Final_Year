@@ -1,0 +1,30 @@
+{% extends "tableVerticalContent.html"%}
+{% load loadAttr%}
+{% block content%}
+{% include "horizontalTableEventTrigger.html"%}
+<table id="HorizontalTableStyle">
+<thead>
+    {%if totalPage > 1%}
+        <tr>
+            <th>
+                {%include "switchPage.html"%}
+            </th>
+        </tr>
+    {%endif%}
+    <tr>
+        {%for a in attName%}
+           <th>
+                {{a.name}}
+            </th>
+        {%endfor%}
+    </tr>
+</thead>
+<tbody id="id_table_body">
+{%autoescape off%}
+{{tableContents}}
+{%endautoescape%}
+{%block extableContent%}
+{% endblock %}
+</tbody>
+</table>
+{%endblock%}

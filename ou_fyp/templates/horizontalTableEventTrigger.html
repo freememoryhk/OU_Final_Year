@@ -1,0 +1,34 @@
+<script>
+    function row_update_click(pkv)
+    {
+        alertify.confirm("Do you want to update holder " + pkv +"?",function(e)
+        {
+            if (e)
+            {
+                window.open("{{updateLink}}?id="+pkv,"_blank");
+                console.log("Go Update");
+            }
+        });
+        console.log("Update " + pkv);
+        return false;
+    }
+    function row_delete_click(pkv)
+    {
+        alertify.confirm("Do you want to update holder " + pkv +"?",function(e)
+        {
+            if (e)
+            {
+                var request = $.ajax({url:"{{deleteLink}}",data:{id:pkv}});
+                request.done
+                (
+                    function(data)
+                    {
+                        //console.log(data);
+                        location.reload();
+                    }
+                );
+            }
+        });
+        return false;
+    }
+</script>

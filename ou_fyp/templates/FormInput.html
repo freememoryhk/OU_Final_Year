@@ -1,0 +1,22 @@
+{% extends "tableVerticalContent.html" %}
+{%block title%}
+{{title}}
+{%endblock%}
+{% block tableContent %}
+{%include "FormInclude.html"%}
+{%include "FormJSFunction.html"%}
+<form id="id_baseForm" method="POST" action="{{submitLink}}">
+{%csrf_token%}
+{{form}}
+{%block topOfSubmit%}{%endblock%}
+<tr>
+    <td>
+        {%block leftOfSubmit%}{%endblock%}
+    </td>
+    <td>
+        <input type="submit" id="id_baseForm_Submit">
+</td>
+</tr>
+{%block bottonOfSubmit%}{%endblock%}
+</form>
+{% endblock %}
