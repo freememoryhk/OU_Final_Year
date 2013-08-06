@@ -1,11 +1,8 @@
 # Create your views here.
-<<<<<<< HEAD
 #from django.http import HttpResponse
 #from django.template import Context,Template,loader
-=======
 from django.http import HttpResponse
 from django.template import Context,Template,loader
->>>>>>> 495fa86ea5d97b89dda4e984fe58b68040564eed
 from ou_fyp.services.AbstractView import *;
 from django.contrib.auth.models import User,Group;
 class UserParameterReader(AbstractParameterReader):
@@ -17,11 +14,7 @@ class UserViews(AbstractView):
         super().__init__(request);
         self.setReaderStratedy(UserParameterReader);
     def register(self):
-<<<<<<< HEAD
-        #from ou_fyp.services.templates.InputForm import RegisterForm;
-=======
         from ou_fyp.services.templates.InputForm import RegisterForm;
->>>>>>> 495fa86ea5d97b89dda4e984fe58b68040564eed
         uf = RegisterForm(self.request.request.POST);
         if uf.is_valid():
             u = uf.save(); 

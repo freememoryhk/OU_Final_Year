@@ -4,7 +4,6 @@
 {%endblock%}
 {% block tableContent %}
 {%include "FormInclude.html"%}
-<<<<<<< HEAD
 {% if not noajax|default:False%}
 <script>
 {%block setupAJAX%}
@@ -70,9 +69,7 @@ function submitDone(data)
 }
 </script>
 {%endif%}
-=======
 {%include "FormJSFunction.html"%}
->>>>>>> 495fa86ea5d97b89dda4e984fe58b68040564eed
 <form id="id_baseForm" method="POST" action="{{submitLink}}">
 {%csrf_token%}
 {{form}}
