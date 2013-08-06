@@ -35,7 +35,8 @@ class AbstractView:
             raise InvokeMethodException(service);
         else:
             self.invokedService = service;
-            self.submitLink = "/services/{}/{}".format(self.__class__.__name__.lower()[0:-5],self.invokedService);
+            self.viewLink = "/{}/{}".format(self.__class__.__name__.lower()[0:-5],self.invokedService);
+            self.submitLink = "/services{}".format(self.viewLink);
             return getattr(self,service)();
 """
 class Test(AbstractView):

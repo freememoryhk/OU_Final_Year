@@ -6,11 +6,6 @@ from ou_fyp.services.AbstractView import *;
 from ou_fyp.services.templates.InputForm import *;
 from django.contrib.auth.models import User,Group;
 #from django.core.context_processors import csrf;
-from django.template import Context,Template,loader
-from ou_fyp.services.AbstractView import *;
-from ou_fyp.services.templates.InputForm import RegisterForm;
-from django.contrib.auth.models import User,Group;
-from django.core.context_processors import csrf;
 class UserParameterReader(AbstractParameterReader):
     def __init__(self,request):
         super().__init__(request);
@@ -30,6 +25,6 @@ class UserViews(AbstractView):
         from django.contrib.auth.forms import AuthenticationForm
         ul = AuthenticationForm();
         templateObj = loader.get_template("login.html");
-        fill = {"form":ul,"title":"Register to system","submitLink":self.submitLink};
+        fill = {"form":ul,"noajax":True,"title":"Login to system","submitLink":self.submitLink};
         context= Context(self.request.request,fill);
         return templateObj.render(context);    

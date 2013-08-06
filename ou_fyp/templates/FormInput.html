@@ -68,8 +68,11 @@ function submitDone(data)
     $("#id_baseForm_Submit").prop("disabled",false);
 }
 </script>
+{%else%}
+<script>
+    $(document).ready(function(){console.log("View disabled ajax in templates")});
+</script>
 {%endif%}
-{%include "FormJSFunction.html"%}
 <form id="id_baseForm" method="POST" action="{{submitLink}}">
 {%csrf_token%}
 {{form}}

@@ -7,19 +7,27 @@ def testBFLink(request,bar):
     request = RequestDecorator(request);
     request.addPars("id",bar);
     return handleRequest(request,"test","hellowould","services");
-def loadInstance(request,handler,service,package):
+def instanceFactoryMethod(request,handler,service,package):
+    if package == "services":
+        package = "services"
+    elif package == "templates":
+        package = "services.templates";
     module = __import__("{}.{}.{}Views".format("ou_fyp",package,handler.capitalize()),fromlist=["{}Views".format(service)]);
     handler = handler.capitalize();
     classInstance = getattr(module,"{}Views".format(handler))(request);
+    classInstance.responseFormat = getattr(Formats,request.getParameter("responseFormat","json").upper());
     return classInstance;
 def handleRequest(request,handler,service,invokeType):
     try:
         if not isinstance(request,RequestDecorator):
             request = RequestDecorator(request);
-        responseContent = globals().get(invokeType)(request,handler,service);
+        classInstance = instanceFactoryMethod(request,handler,service,invokeType);
+        responseContent = classInstance.invoke(service);
         if isinstance(responseContent,HttpResponse):
             return responseContent;
         else:
+            if responseContent is None:
+                responseContent = classInstance.simpleOutPut();
             if invokeType == "services":
                 contentType = "text/html";
                 resformat = request.getParameter("responseFormat","json");
@@ -40,11 +48,4 @@ def handleRequest(request,handler,service,invokeType):
         return HttpResponse(pne);
     except InvokeMethodException as ime:
         return HttpResponse(ime);
-def services(request,handler,service): 
-    classInstance = loadInstance(request,handler,service,"services");
-    classInstance.responseFormat=getattr(Formats,request.getParameter("responseFormat","json").upper());
-    return classInstance.invoke(service);
-def templates(request,handler,service):
-    classInstance = loadInstance(request,handler,service,"services.templates");
-    return classInstance.invoke(service);
 
