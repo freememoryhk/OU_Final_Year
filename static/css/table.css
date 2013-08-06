@@ -1,0 +1,61 @@
+/* ------------------
+ styling for the tables 
+   ------------------   */
+#HorizontalTableStyle
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	text-align: center;
+	border-collapse: collapse;
+}
+#HorizontalTableStyle th
+{
+	font-size: 16px;
+	font-weight: bold;
+	padding: 10px 8px;
+	color: #039;
+}
+#HorizontalTableStyle td
+{
+	padding: 12px;
+	color: #000000;
+}
+#HorizontalTableStyle .odd
+{
+	background: #d7ecee; 
+}
+#HorizontalTableStyle tr:hover td
+{
+	background: #cc7777;
+	color: #fff;
+}
+
+#VerticalContentTableStyle
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	text-align: center;
+	border-collapse: collapse;
+}
+#VerticalContentTableStyle th
+{
+	font-size: 16px;
+	font-weight: bold;
+	padding: 12px 15px;
+	color: #039;
+}
+#VerticalContentTableStyle td
+{
+	padding: 10px 15px;
+	color: #000;
+	border-top: 1px solid #e8edff;
+}
+#VerticalContentTableStyle .firstCol
+{
+	background: #d7ecee;
+}
+#VerticalContentTableStyle tr:hover td
+{
+	background: #cc7777;
+	color: #fff;
+}

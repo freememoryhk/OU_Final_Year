@@ -1,0 +1,33 @@
+<link rel="stylesheet" type="text/css" href="/static/css/jMenu.jquery.css" media="screen"/>
+<script type="text/javascript" src="/static/js/jMenu.jquery.js"></script>
+<script>
+$(document).ready
+(
+    function()
+    {
+        $("#topNavigations").jMenu();
+    }
+);
+</script>
+<ul id="topNavigations">
+<li><a class="fNiv" href="/holder/showHolder">Holders</a>
+<ul>
+<li><a href="/holder/saveHolder">Add holders</a></li>
+<li><a href="/holder/showHolder">List holders</a></li>
+</ul>
+</li>
+<li><a href="/account/showAccount">Account</a>
+<ul>
+<li><a href="/account/saveAccount">Add Account</a></li>
+<li><a href="/account/showAccount">List Account</a></li>
+</ul>
+</li>
+<li><a href="/site/showSite">Site</a>
+<ul>
+<li><a href="/site/saveSite">Add Sites</a></li>
+<li><a href="/site/showSite">List Sites</a></li>
+</ul>
+</li>
+<li><a href="/password/savePassword">Password</a></li>
+<li><a href="http://172.17.3.1/mysql/">Direct Access DB</a></li>
+</ul>
