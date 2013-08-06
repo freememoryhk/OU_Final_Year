@@ -6,12 +6,16 @@
         {% include "baseInclude.html"%}
     </head>
     <body>
+<<<<<<< HEAD
         {% if not user.is_authenticated  %}
             {% include "navigations.html"%}
         {% else %}
             
         {% endif %}
 
+=======
+        {% include "navigations.html"%}
+>>>>>>> 495fa86ea5d97b89dda4e984fe58b68040564eed
         {% block content%}
         {% endblock %}
     </body>

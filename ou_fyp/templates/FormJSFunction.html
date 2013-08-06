@@ -1,11 +1,3 @@
-{% extends "tableVerticalContent.html" %}
-{%block title%}
-{{title}}
-{%endblock%}
-{% block tableContent %}
-{%include "FormInclude.html"%}
-<<<<<<< HEAD
-{% if not noajax|default:False%}
 <script>
 {%block setupAJAX%}
     var submitOpt = {%block ajaxOpt%}{beforeSend:addCSRFHeader,beforeSubmit:beforeSubmitCorrection,dataType:"json",success:submitDone,resetForm:true}{%endblock%};
@@ -20,6 +12,7 @@
         }
     );
 {%endblock%}
+{%block ajaxCallFunction%}
 function addCSRFHeader(request)
 {
     token = $.cookie("csrftoken");
@@ -68,23 +61,5 @@ function submitDone(data)
     $("#id_status").append("Input Finish");
     $("#id_baseForm_Submit").prop("disabled",false);
 }
+{%endblock%}
 </script>
-{%endif%}
-=======
-{%include "FormJSFunction.html"%}
->>>>>>> 495fa86ea5d97b89dda4e984fe58b68040564eed
-<form id="id_baseForm" method="POST" action="{{submitLink}}">
-{%csrf_token%}
-{{form}}
-{%block topOfSubmit%}{%endblock%}
-<tr>
-    <td>
-        {%block leftOfSubmit%}{%endblock%}
-    </td>
-    <td>
-        <input type="submit" id="id_baseForm_Submit">
-</td>
-</tr>
-{%block bottonOfSubmit%}{%endblock%}
-</form>
-{% endblock %}
