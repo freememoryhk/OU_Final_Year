@@ -27,9 +27,9 @@ class UserViews(AbstractView):
         context= Context(self.request.request,fill);
         return templateObj.render(context);    
     def login(self):
-        ul = LoginForm();
+        from django.contrib.auth.forms import AuthenticationForm
+        ul = AuthenticationForm();
+        templateObj = loader.get_template("login.html");
+        fill = {"form":ul,"title":"Register to system","submitLink":self.submitLink};
         context= Context(self.request.request,fill);
-        return templateObj.render(context);
-        fill = dict(list(csrf(self.request.request).items())+list({"form":uf,"title":"Register to system","submitLink":self.submitLink}.items()))
-        context= Context(fill);
         return templateObj.render(context);    
