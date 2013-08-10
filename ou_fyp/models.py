@@ -1,9 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User,Group
-class AutoZeroField(models.CharField):
+from django.contrib.auth.models import User,Group    
+class AutoZeroField(models.AutoField,metaclass=models.SubfieldBase):
     description = "Let auto increment with zero fill";
-    def db_type(self,connection):
-        return "\"SerialWithZero\"";
+    def to_python(self,value):
+        from ou_fyp.libs.Formatter import NumericZeroFormatter;
+        if value is None:
+            return super(AutoZeroField,self).to_python(value); 
+        else:
+            return NumericZeroFormatter().format(str(value));
 class AbstractBaseModel(models.Model):
     #id=AutoZeroField(primary_key=True);
     def __combinManyKeyInToOneKey(self,keys):
@@ -13,22 +17,44 @@ class AbstractBaseModel(models.Model):
         return combinedKey[0:len(combinedKey)-1];
     class Meta:
         abstract = True;
-
 class Tags(AbstractBaseModel):
-    tag_id = AutoZeroField(primary_key=True,max_length=11);
+    tag_id = AutoZeroField(primary_key=True);
     tag_name = models.CharField(max_length=25,unique=True);
-    tag_hit_counts = models.IntegerField();
+    tag_hit_counts = models.IntegerField(default=0);
+class TagsProxy(Tags):
     def hit(self):
         if self.tag_id is not None:
             self.tag_hit_counts+=1;
             self.save();
+    def popluarTagsList(self):
+        popluarTagsLists = Tags.objects.all().order_by("-tag_hit_counts")[0:10];
+        popluarTagsTuple = [];
+        for tags in popluarTagsLists:
+            popluarTagsTuple.append((tags.tag_id,tags.tag_name));
+        return popluarTagsTuple;
+    def excludePopluarTagsList(self,popluarTagsTuple = None):
+        popluarTagsLists = [];
+        if popluarTagsTuple is None:
+            popluarTagsTuple = self.popluarTagsLists();
+        for tags in popluarTagsTuple:
+            popluarTagsLists.append(tags[0]);
+        otherList = Tags.objects.filter(tag_id__in=popluarTagsLists);
+        return otherList;
+    class Meta:
+        proxy = True;
 class ThreeDimensionsProjects(AbstractBaseModel):
     project_id = AutoZeroField(primary_key=True,max_length=11);
     designer = models.ForeignKey(User,db_index=True);
     price = models.DecimalField(max_digits=7,decimal_places=1,default=0.0);
     project_description = models.TextField(max_length=255);
+    #project_tags = AutoZeroManyToManyField(Tags,through="Threedimensionsprojects_tags");
     project_tags = models.ManyToManyField(Tags);
     project_shared_group = models.ManyToManyField(Group);
+"""
+class Threedimensionsprojects_tags(AbstractBaseModel):
+    tag = AutoZeroForeignKey(Tags);
+    project = AutoZeroForeignKey(ThreeDimensionsProjects);
+"""
 class PurchasedProjects(AbstractBaseModel):
     deal_date = models.DateTimeField(auto_now_add=True,editable=False);
     buyer = models.ForeignKey(User,db_index=True)

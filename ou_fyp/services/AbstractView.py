@@ -28,6 +28,14 @@ class AbstractView:
                 for key,value in basicResult.items():
                     root.documentElement.setAttribute(key,value);
                 return root.toprettyxml(encoding="utf-8").decode("utf-8");
+    def checkLogedIn(self,redirect="/user/login",next=None):
+        if not self.request.request.user.is_authenticated():
+            from django.shortcuts import redirect;
+            if next is not None:
+                redirectObj = redirect("{}?next={}".format(redirect,next));
+            else:
+                redirectObj = redirect("{}?next={}".format(redirect,self.viewLink));
+            return redirectObj;
     def setReaderStratedy(self,stratedyClass):
         self.parsReader= stratedyClass(self.request);
     def invoke(self,service):
@@ -35,7 +43,8 @@ class AbstractView:
             raise InvokeMethodException(service);
         else:
             self.invokedService = service;
-            self.submitLink = "/services/{}/{}".format(self.__class__.__name__.lower()[0:-5],self.invokedService);
+            self.viewLink = "/{}/{}".format(self.__class__.__name__.lower()[0:-5],self.invokedService);
+            self.submitLink = "/services{}".format(self.viewLink);
             return getattr(self,service)();
 """
 class Test(AbstractView):
