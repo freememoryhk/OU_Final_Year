@@ -4,3 +4,4 @@
 *.swp
 *.cpython-33.pvc
 local_settings.py
+sftp-config.json
