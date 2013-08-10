@@ -4,7 +4,75 @@
 {%endblock%}
 {% block tableContent %}
 {%include "FormInclude.html"%}
-{%include "FormJSFunction.html"%}
+{% if not noajax|default:False%}
+<script>
+{%block setupAJAX%}
+    var submitOpt = {%block ajaxOpt%}{beforeSend:addCSRFHeader,beforeSubmit:beforeSubmitCorrection,dataType:"json",success:submitDone,resetForm:true}{%endblock%};
+    $(document).ready
+    (
+        function()
+        {
+            $("#id_status").empty();
+            $("#id_status").append("Input Your data");
+            $("#id_baseForm").ajaxForm(submitOpt);
+            validation();
+        }
+    );
+{%endblock%}
+function addCSRFHeader(request)
+{
+    token = $.cookie("csrftoken");
+    console.log(token);
+    request.setRequestHeader("X-CSRFToken",token);
+}
+function validation(obj)
+{
+    var defaultObj = {};
+    var paramObj = $.extend({},defaultObj,obj);
+    var resultValidation = true;
+    //console.log("Hello");
+    {%block jsValidation%}
+    {%endblock%}
+    if (resultValidation === true)
+    {
+        $("#id_baseForm_Submit").prop("disabled",false);
+    }
+    else
+    {
+        $("#id_baseForm_Submit").prop("disabled",true);
+    }
+    return resultValidation;
+}
+function beforeSubmitCorrection(arr)
+{
+    var formIsValid = validation();
+    if (formIsValid === false)
+    {
+        return formIsValid;
+    }
+    else
+    {
+        $("#id_baseForm_Submit").prop("disabled",true);
+        
+        {%block beforesubmit%}
+            return formIsValid;
+        {%endblock%}
+    }   
+}
+function submitDone(data)
+{
+    $("#id_status").empty();
+{%block submitDoneFunction%}
+{%endblock%}
+    $("#id_status").append("Input Finish");
+    $("#id_baseForm_Submit").prop("disabled",false);
+}
+</script>
+{%else%}
+<script>
+    $(document).ready(function(){console.log("View disabled ajax in templates")});
+</script>
+{%endif%}
 <form id="id_baseForm" method="POST" action="{{submitLink}}">
 {%csrf_token%}
 {{form}}
