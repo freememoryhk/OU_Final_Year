@@ -2,4 +2,5 @@
 *.pot
 *.pyc
 *.swp
+*.cpython-33.pvc
 local_settings.py
