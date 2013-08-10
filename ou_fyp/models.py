@@ -18,10 +18,27 @@ class Tags(AbstractBaseModel):
     tag_id = AutoZeroField(primary_key=True,max_length=11);
     tag_name = models.CharField(max_length=25,unique=True);
     tag_hit_counts = models.IntegerField();
+class TagsProxy(Tags):
     def hit(self):
         if self.tag_id is not None:
             self.tag_hit_counts+=1;
             self.save();
+    def popularTags(self):
+        tagTuples = ();
+        #Order by tag_hit_counts DESC and get first 10 result.
+        popResults = Tags.objects.order_by["-tag_hit_counts"][0:10]; 
+        for tag in popResults:
+            tagTuples += (tag.tag_id,tag.tag_name);
+        return tagTuples;
+    def getOtherTags(self,excludedTags = None):
+        excludedList = [];
+        if excludedTags is None:
+            excludedTags = self.popularTags;
+        for tags in excludedTags:
+            excludedList.append(tags[0]);
+        return otherTagsWithoutPopular = Tags.objects.filter(tag_id__in=excludedList);
+    class Meta:
+        proxy = True;
 class ThreeDimensionsProjects(AbstractBaseModel):
     project_id = AutoZeroField(primary_key=True,max_length=11);
     designer = models.ForeignKey(User,db_index=True);
