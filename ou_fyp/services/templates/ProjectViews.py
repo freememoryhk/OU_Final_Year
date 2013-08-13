@@ -25,7 +25,7 @@ class ProjectViews(AbstractView):
     """
     def create(self):
         pc = CreateProjectForm();
-        templateObj = loader.get_template("formCreate.html");
+        templateObj = loader.get_template("CreateProject.html");
         fill = {"form":pc,"noajax":True,"title":"Content Creation","submitLink":self.submitLink};
         context= Context(self.request.request,fill);
         return templateObj.render(context);    
