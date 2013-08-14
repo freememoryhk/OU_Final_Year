@@ -6,6 +6,34 @@ class TagsCreateForm(forms.ModelForm):
     class Meta:
         model = Tags;
         fields = ["tag_name"];
+class TagMultiChoice(forms.CheckboxSelectMultiple):
+    def __init__(self,attrs=None,acceptNewTag=False):
+        self.acceptNewTag= acceptNewTag;
+        super(TagMultiChoice,self).__init__(attrs);
+    def render(self,name,value,attrs=None,choices=()):
+        orgInput = super(TagMultiChoice,self).render(name,value,attrs,choices);
+        tagInput = "</br><input id='{0}'/><button id='{0}_btn'>Add Tag</button>".format("id_"+name+"_add");
+        jsForInput = "<script>";
+        jsForInput += "$(document).ready";
+        jsForInput += "(";
+        jsForInput += "function()";
+        jsForInput += "{";
+        jsForInput += "$(\"#id_{}_add_btn\").click".format(name);
+        jsForInput += "(";
+        jsForInput += "function(event)";
+        jsForInput += "{";
+        jsForInput += "event.preventDefault();console.log(\"Hello\")";
+        jsForInput += "}";
+        jsForInput += ")";
+        jsForInput += "}";
+        jsForInput += ");";
+        jsForInput += "</script>";
+        from django.utils.safestring import mark_safe
+        finalOutPut = []
+        finalOutPut.append(orgInput);
+        finalOutPut.append(tagInput);
+        finalOutPut.append(jsForInput);
+        return str(mark_safe("\n".join(finalOutPut)));
 class CreateProjectForm(forms.ModelForm):
     #project_tags = forms.MultipleChoiceField(label="Project Tags");
     #project_contents = forms.FileField(label="STL content");
@@ -15,7 +43,7 @@ class CreateProjectForm(forms.ModelForm):
         popList = tags.popluarTagsList();
         #self.project_tags = forms.MultipleChoiceField(label="Project Tags",choices=popList);
         #self.project_contents = forms.FileField(label="STL content");
-        self.fields["project_tags"] = forms.MultipleChoiceField(label="Project Tags",choices=popList);
+        self.fields["project_tags"] = forms.MultipleChoiceField(widget=TagMultiChoice,label="Project Tags",choices=popList);
         self.fields["project_contents"] = forms.FileField(label="STL content");
         self.project_tags_autocomplete = tags.excludePopluarTagsList(popluarTagsTuple=popList);
     class Meta:

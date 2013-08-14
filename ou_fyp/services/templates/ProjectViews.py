@@ -14,6 +14,12 @@ class ProjectViews(AbstractView):
     def __init__(self,request):
         super().__init__(request);
         self.setReaderStratedy(ProjectParameterReader);
+    def create(self):
+        pc = CreateProjectForm();
+        templateObj = loader.get_template("CreateProject.html");
+        fill = {"form":pc,"noajax":True,"title":"Content Creation","submitLink":self.submitLink};
+        context= Context(self.request.request,fill);
+        return templateObj.render(context);
 """
     def show(self):
         uf = RegisterForm();
@@ -22,10 +28,4 @@ class ProjectViews(AbstractView):
         fill = {"form":uf,"noajax":True,"title":"Register to system","submitLink":self.submitLink};
         context= Context(self.request.request,fill);
         return templateObj.render(context);    
-    """
-    def create(self):
-        pc = CreateProjectForm();
-        templateObj = loader.get_template("CreateProject.html");
-        fill = {"form":pc,"noajax":True,"title":"Content Creation","submitLink":self.submitLink};
-        context= Context(self.request.request,fill);
-        return templateObj.render(context);    
+"""
