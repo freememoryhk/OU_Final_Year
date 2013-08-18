@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User,Group    
+from django.contrib.auth.models import User,Group;
 class AutoZeroField(models.AutoField,metaclass=models.SubfieldBase):
     description = "Let auto increment with zero fill";
     def to_python(self,value):
@@ -38,7 +38,7 @@ class TagsProxy(Tags):
             popluarTagsTuple = self.popluarTagsLists();
         for tags in popluarTagsTuple:
             popluarTagsLists.append(tags[0]);
-        otherList = Tags.objects.filter(tag_id__in=popluarTagsLists);
+        otherList = Tags.objects.filter(~models.Q(tag_id__in=popluarTagsLists));
         return otherList;
     class Meta:
         proxy = True;
