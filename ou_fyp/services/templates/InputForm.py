@@ -7,6 +7,10 @@ class TagsCreateForm(forms.ModelForm):
     class Meta:
         model = Tags;
         fields = ["tag_name"];
+class DynamicMultipleChoiceField(forms.MultipleChoiceField):
+    def validate(self, value):
+        if self.required and not value:    
+            raise ValidationError(self.error_messages['required'])
 class TagMultiChoice(forms.CheckboxSelectMultiple):
     def __init__(self,attrs=None,acceptNewTag=False,rowSize=2):
         self.acceptNewTag= acceptNewTag;
@@ -31,7 +35,7 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
                 aviableToPut.append(tag.tag_name);
         jArrayForVal=[];
         for index,choice in enumerate(choices):
-            choicesInput = "<li><input type=\"checkbox\" name=\"{0}\" id=\"id_{0}_{1}\" value=\"{2[0]}\"><label for=\"id_{0}_{1}\">{2[1]}</label></li>".format(name,index,choice);
+            choicesInput = "<li><input type=\"checkbox\" name=\"{0}\" id=\"id_{0}_{1}\" value=\"{2[1]}\"/><label for=\"id_{0}_{1}\">{2[1]}</label></li>".format(name,index,choice);
             jArrayForVal.append(choice[1]);
             if index % self.rowSize == 0:
                 if index != 0:
@@ -39,7 +43,10 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
                 contentInput.append("<ul id=\"row_{}\">".format(row));
                 row+=1;
                 rowRemaining = self.rowSize;
-                contentInput.append(choicesInput);
+                if index == 0:
+                    contentInput.append("<li>{0}</li>{1}".format(tagInput,choicesInput));
+                else:
+                    contentInput.append(choicesInput);
             else:
                 if index < self.rowSize and index == self.rowSize -1 :
                     contentInput.append("{}<li>{}</li>".format(choicesInput,tagInput));
@@ -62,7 +69,7 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
         jsForInput.append("function()");
         jsForInput.append("{");
         #jsForInput += "$(\"#id_{}_checkbox_list\").buttonset();".format(name);
-        jsForInput.append("console.log(\"Auto Complete List:\"+avaiTags);");
+        #jsForInput.append("console.log(\"Auto Complete List:\"+avaiTags);");
         jsForInput.append("$(\"#id_{}_add\").autocomplete".format(name));
         jsForInput.append("(");
         jsForInput.append("{");
@@ -70,7 +77,7 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
         if self.acceptNewTag == False:
             jsForInput.append(",change: function(event,ui)");
             jsForInput.append("{");
-            jsForInput.append("console.log(\"New Value\"+$(this).val())");
+            #jsForInput.append("console.log(\"New Value\"+$(this).val())");
             jsForInput.append("if (avaiTags.indexOf($(this).val()) == -1)");
             jsForInput.append("{");
             jsForInput.append("$(this).trigger('keydown.autocomplete');");
@@ -107,7 +114,7 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
         jsForInput.append("attackDOM = $(\"#row_\"+maxRow);");
         jsForInput.append("}");
         jsForInput.append("var rowIndex = (maxRow * perRowSize) +(perRowSize - maxRowRemaining)");
-        jsForInput.append("var newRow =\"<li><input type='checkbox' checked='checked' name='{0}' id='id_{0}_\"+rowIndex+\"' value='\"+rowValue+\"'><label for='id_{0}_\"+rowIndex+\"'>\"+rowValue+\"</label></li>\"".format(name));
+        jsForInput.append("var newRow =\"<li><input type='checkbox' checked='checked' name='{0}' id='id_{0}_\"+rowIndex+\"' value='\"+rowValue+\"'/><label for='id_{0}_\"+rowIndex+\"'>\"+rowValue+\"</label></li>\"".format(name));
         jsForInput.append("attackDOM.append(beforeNewRow+newRow+afterNewRow)");
         jsForInput.append("maxRowRemaining -= 1");
         jsForInput.append("existingTags.push(rowValue)");
@@ -116,9 +123,9 @@ class TagMultiChoice(forms.CheckboxSelectMultiple):
         jsForInput.append("avaiTags.splice(avaiTags.indexOf(rowValue),1)");
         jsForInput.append("}");
         jsForInput.append("tagField.val(\"\")");
-        jsForInput.append("console.log(\"New Max Row Index\"+maxRow);");
-        jsForInput.append("console.log(\"New Row Size\"+perRowSize);");
-        jsForInput.append("console.log(\"New Max Row Remaining\"+maxRowRemaining);");
+        #jsForInput.append("console.log(\"New Max Row Index\"+maxRow);");
+        #jsForInput.append("console.log(\"New Row Size\"+perRowSize);");
+        #jsForInput.append("console.log(\"New Max Row Remaining\"+maxRowRemaining);");
         jsForInput.append("}");
         jsForInput.append(")");
         jsForInput.append("}");
@@ -142,10 +149,10 @@ class CreateProjectForm(forms.ModelForm):
         popList = tags.popluarTagsList();
         #self.project_tags = forms.MultipleChoiceField(label="Project Tags",choices=popList);
         #self.project_contents = forms.FileField(label="STL content");
-        self.fields["project_tags"] = forms.MultipleChoiceField(widget=TagMultiChoice,label="Project Tags",choices=popList);
+        self.fields["project_tags"] = DynamicMultipleChoiceField(widget=TagMultiChoice,label="Project Tags",choices=popList,required=False);
         self.fields["project_tags"].widget.acceptNewTag = True;
         self.fields["project_tags"].widget.rowSize = 5;
-        self.fields["project_contents"] = forms.FileField(label="STL content");
+        self.fields["project_contents"] = forms.FileField(label="STL content",required=False);
         self.project_tags_autocomplete = tags.excludePopluarTagsList(popluarTagsTuple=popList);
     class Meta:
         model = ThreeDimensionsProjects;

@@ -14,7 +14,7 @@ class TagViews(AbstractView):
     def __init__(self,request):
         super().__init__(request);
         self.setReaderStratedy(TagParameterReader);
-    def createTags(self):
+    def create(self):
         tc = TagsCreateForm(self.request.request.POST);
         if tc.is_valid():
             t = tc.save();

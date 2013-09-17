@@ -2,6 +2,10 @@
 {%block title%}
 {{title}}
 {%endblock%}
+{%block topOfTable%}
+<form id="id_baseForm" method="POST" action="{{submitLink}}" {%block additionalFormAttr%}{%endblock%} >
+{%csrf_token%}
+{%endblock%}
 {% block tableContent %}
 {%include "FormInclude.html"%}
 {% if not noajax|default:False%}
@@ -70,11 +74,23 @@ function submitDone(data)
 </script>
 {%else%}
 <script>
-    $(document).ready(function(){console.log("View disabled ajax in templates")});
+    $(document).ready(function()
+    {
+        console.log("View disabled ajax in templates");
+        /*
+        $("#id_baseForm").submit
+        (
+            function(event)
+            {
+                event.preventDefault();
+                console.log($(this).serialize());
+                console.log($(this));
+            }
+        );
+        */
+    });
 </script>
 {%endif%}
-<form id="id_baseForm" method="POST" action="{{submitLink}}">
-{%csrf_token%}
 {{form}}
 {%block topOfSubmit%}{%endblock%}
 <tr>
@@ -86,5 +102,7 @@ function submitDone(data)
 </td>
 </tr>
 {%block bottonOfSubmit%}{%endblock%}
-</form>
 {% endblock %}
+{%block bottomOfTable%}
+</form>
+{%endblock%}

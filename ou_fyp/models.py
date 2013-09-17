@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User,Group;
+import base64;
 class AutoZeroField(models.AutoField,metaclass=models.SubfieldBase):
     description = "Let auto increment with zero fill";
     def to_python(self,value):
@@ -10,7 +11,7 @@ class AutoZeroField(models.AutoField,metaclass=models.SubfieldBase):
             return NumericZeroFormatter().format(str(value));
 class AbstractBaseModel(models.Model):
     #id=AutoZeroField(primary_key=True);
-    def __combinManyKeyInToOneKey(self,keys):
+    def combinManyKeyInToOneKey(self,keys):
         combinedKey="";
         for key in keys:
             combinedKey+=str(key)+"_";
@@ -62,7 +63,7 @@ class PurchasedProjects(AbstractBaseModel):
     price = models.DecimalField(max_digits=7,decimal_places=1,default=0.0);
     trading_id = models.CharField(primary_key=True,max_length=23);
     def save(self,*args,**kwargs):
-        self.trading_id = self.__combinManyKeyInToOneKey([self.project.project_id,self.buyer.id]);
+        self.trading_id = self.combinManyKeyInToOneKey([self.project.project_id,self.buyer.id]);
         super(PurchasedProjects,self).save(*args,**kwargs);
 class ProjectContentLog(AbstractBaseModel):
     project = models.ForeignKey(ThreeDimensionsProjects,db_index=True);
@@ -70,19 +71,16 @@ class ProjectContentLog(AbstractBaseModel):
     change_message = models.TextField(max_length=255,blank=True);
     change_time = models.DateTimeField(auto_now_add=True,editable=False);
     from django import forms;
-    import base64;
     _project_content = models.TextField(max_length=1*1024*1024*1024*8,db_column="project_content");
     def set_content(self,submitFile):
-        bufferStorage = bytearray();
-        for byte in submitFile.chunks():
-            bufferStorage.append(byte);
-        self._project_content = base64.encodebytes(bufferStorage).encode("ascii");
-    def get_content(self,encodingFile):
-        return base64.decodebytes(self._project_content.decode("ascii"));
+        buffer = bytearray(submitFile.read());
+        self._project_content = base64.b64encode(buffer);
+    def get_content(self):
+        return base64.b64decode(self._project_content);
     project_content=property(get_content,set_content);
     project_version = models.CharField(max_length=10);
     project_version_id = models.CharField(primary_key=True,max_length=80);
     project_import = models.ManyToManyField('self');
     def save(self,*args,**kwargs):
-        self.project_version_id = self.__combinManyKeyInToOneKey([self.project.project_id,self.change_time]);
+        self.project_version_id = self.combinManyKeyInToOneKey([self.project.project_id,self.project_version]);
         super(ProjectContentLog,self).save(*args,**kwargs);

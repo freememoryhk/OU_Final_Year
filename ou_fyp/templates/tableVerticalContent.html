@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "tableInclude.html"%}
+{%block topOfTable%}
+{%endblock%}
 <table id="VerticalContentTableStyle">
 <colgroup>
     <col span="1" class="firstCol"/>
@@ -20,4 +22,6 @@
 {% endblock %}
 </tbody>
 </table>
+{%block bottomOfTable%}
+{%endblock%}
 {% endblock %}
