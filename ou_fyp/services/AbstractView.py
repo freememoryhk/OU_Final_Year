@@ -1,4 +1,5 @@
 from ou_fyp.libs.ResponseFormats import *;
+from ou_fyp.libs.MyExceptions import *;
 class InvokeMethodException(Exception):
     def __init__(self,invokedMethod):
         self.methodName = invokedMethod;
@@ -30,12 +31,12 @@ class AbstractView:
                 return root.toprettyxml(encoding="utf-8").decode("utf-8");
     def checkLogedIn(self,redirect="/user/login",next=None):
         if not self.request.request.user.is_authenticated():
-            from django.shortcuts import redirect;
+            errorObj = None;
             if next is not None:
-                redirectObj = redirect("{}?next={}".format(redirect,next));
+                errorObj = RequestLoginException(next=next,redirect=redirect);
             else:
-                redirectObj = redirect("{}?next={}".format(redirect,self.viewLink));
-            return redirectObj;
+                errorObj = RequestLoginException(next=self.viewLink,redirect=redirect);
+            raise errorObj;
     def setReaderStratedy(self,stratedyClass):
         self.parsReader= stratedyClass(self.request);
     def invoke(self,service):

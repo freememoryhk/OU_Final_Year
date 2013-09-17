@@ -1,1 +1,6 @@
 {% extends "FormInput.html" %}
+{%block topOfSubmit%}
+    {% if next%}
+    <input type="hidden" name="next" value='{{next}}'></input>
+    {% endif%}
+{%endblock%}

@@ -1,5 +1,6 @@
 # Create your views here.
 from ou_fyp.libs.RequestDecorate import *;
+from ou_fyp.libs.MyExceptions import *;
 from django.http import HttpRequest,HttpResponse;
 from ou_fyp.libs.ResponseFormats import *;
 from ou_fyp.services.AbstractView import *;
@@ -48,4 +49,6 @@ def handleRequest(request,handler,service,invokeType):
         return HttpResponse(pne);
     except InvokeMethodException as ime:
         return HttpResponse(ime);
+    except ForbiddenException as fe:
+        return fe.getRemedialAction();
 

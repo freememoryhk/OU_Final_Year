@@ -15,6 +15,7 @@ class ProjectViews(AbstractView):
         super().__init__(request);
         self.setReaderStratedy(ProjectParameterReader);
     def create(self):
+        self.checkLogedIn();
         pc = CreateProjectForm();
         templateObj = loader.get_template("CreateProject.html");
         fill = {"form":pc,"noajax":True,"title":"Content Creation","submitLink":self.submitLink};

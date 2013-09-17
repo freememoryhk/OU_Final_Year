@@ -10,6 +10,7 @@ class UserParameterReader(AbstractParameterReader):
     def __init__(self,request):
         super().__init__(request);
         self.projectId = self.request.getParameter("id",acceptNone=True);
+        self.next = self.request.getParameter("next",acceptNone=True);
 class UserViews(AbstractView):
     def __init__(self,request):
         super().__init__(request);
@@ -26,5 +27,6 @@ class UserViews(AbstractView):
         ul = AuthenticationForm();
         templateObj = loader.get_template("login.html");
         fill = {"form":ul,"noajax":True,"title":"Login to system","submitLink":self.submitLink};
+        fill["next"] = self.parsReader.next;
         context= Context(self.request.request,fill);
         return templateObj.render(context);    
