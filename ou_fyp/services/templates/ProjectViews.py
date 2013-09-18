@@ -25,7 +25,7 @@ class ProjectViews(AbstractView):
     def controlPanel(self):
         self.checkLogedIn();
         templateObj = loader.get_template("Panel.html");
-        fill = {"mainSrc":"/services/project/load/16/0","title":"STL Control Panel"};
+        fill = {"mainSrc":"/services/project/load/{}/{}".format(int(self.parsReader.projectId),self.parsReader.version),"title":"STL Control Panel"};
         context = Context(self.request.request,fill);
         return templateObj.render(context);
 """

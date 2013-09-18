@@ -2,31 +2,121 @@
 {% block content %}
 {% include "PanelInclude.html"%}
 <script>
-$(document).ready(
-function()
+var width = window.innerWidth / 2;
+var height = window.innerHeight / 2;
+var scene ,renderer , camera;
+var container, stats;
+var cameraTarget;
+function init()
 {
-            console.log("Initial envs");
-            var loader = new THREE.STLLoader();
-            loader.addEventListener
-            ( 'load', 
-                function ( event ) 
-                {
-                    var geometry = event.content;
-                    var scene = new THREE.Scene();
-                    scene.add( new THREE.Mesh( geometry ) );
-                    var renderer = new THREE.WebGLRenderer();
-                    var container = $('#container');
-                    container.append(renderer.domElement);
-                    var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-                    camera.position.set( 3, 0.15, 3 );
-                    renderer.setSize(window.innerWidth , window.innerHeight);
-                    renderer.render(scene,camera);
-                } 
-            );
-            loader.load("{{mainSrc}}");
-            console.log("Finish Loading");
+    container = $('#container');
+    camera = new THREE.PerspectiveCamera( 35, width / height, 1, 15 );
+    camera.position.set( 3, 0.15, 3 );
+    cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
+    
+    // Set Ground
+    var plane = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshPhongMaterial( { ambient: 0x999999, color: 0x999999, specular: 0x101010 } ) );
+    plane.rotation.x = -Math.PI/2;
+    plane.position.y = -0.5;
+    scene.add( plane );
+    plane.receiveShadow = true;
+    // End Set Ground
+    
+    // Load File
+    
+    var loader = new THREE.STLLoader();
+    loader.addEventListener( 'load', function ( event ) 
+    {
+        var geometry = event.content;
+        var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+        var mesh = new THREE.Mesh( geometry, material );
+        mesh.position.set( -0.5, -0.5, 0 );
+        mesh.rotation.set( - Math.PI / 2, 0, 0 );
+        mesh.scale.set( 0.3, 0.3, 0.3 );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+    } );
+    var mainSTLSrc = "{{mainSrc}}";
+    console.log(mainSTLSrc);
+    loader.load(mainSTLSrc);
+    // End Load File
+    
+    // Set Lights
+    
+    scene.add( new THREE.AmbientLight( 0x777777 ) );
+    addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+    addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+    
+    // End Set Lights
+    
+    // Set Renderer
+    
+    renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+    renderer.setSize( width, height );
+    renderer.setClearColor( scene.fog.color, 1 );
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+    renderer.physicallyBasedShading = true;
+    renderer.shadowMapEnabled = true;
+    renderer.shadowMapCullFace = THREE.CullFaceBack;
+    container.append( renderer.domElement );
+
+    // End Set Renderer
+    
+    //Set Stats
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.append( stats.domElement );
+    //End Set Stats
+    window.addEventListener( 'resize', onWindowResize, false );
+    animate();
 }
-);
+function onWindowResize() 
+{
+    var newWidth = window.innerWidth / 2;
+    var newHeight = window.innerHeight / 2;
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( newWidth, newHeight );
+}
+function addShadowedLight( x, y, z, color, intensity ) 
+{
+    var directionalLight = new THREE.DirectionalLight( color, intensity );
+    directionalLight.position.set( x, y, z )
+    scene.add( directionalLight );
+    directionalLight.castShadow = true;
+    // directionalLight.shadowCameraVisible = true;
+    var d = 1;
+    directionalLight.shadowCameraLeft = -d;
+    directionalLight.shadowCameraRight = d;
+    directionalLight.shadowCameraTop = d;
+    directionalLight.shadowCameraBottom = -d;
+    directionalLight.shadowCameraNear = 1;
+    directionalLight.shadowCameraFar = 4;
+    directionalLight.shadowMapWidth = 1024;
+    directionalLight.shadowMapHeight = 1024;
+    directionalLight.shadowBias = -0.005;
+    directionalLight.shadowDarkness = 0.15;
+}
+function animate() 
+{
+    requestAnimationFrame( animate );
+    render();
+    stats.update();
+}
+function render() 
+{
+    var timer = Date.now() * 0.0005;
+    camera.position.x = Math.cos( timer ) * 3;
+    camera.position.z = Math.sin( timer ) * 3;
+    camera.lookAt( cameraTarget );
+    renderer.render( scene, camera );
+}
+$(document).ready(init);
 </script>
 <div id="container">
 
