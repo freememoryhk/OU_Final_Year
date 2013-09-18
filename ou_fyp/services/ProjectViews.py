@@ -10,31 +10,24 @@ from ou_fyp.models import *;
 class ProjectParameterReader(AbstractParameterReader):
     def __init__(self,request):
         super().__init__(request);
-        self.projectId = self.request.getParameter("id",acceptNone=True);
+        self.projectId = self.request.getParameter("pid",acceptNone=True);
+        self.version = self.request.getParameter("v",acceptNone=True);
 class ProjectViews(AbstractView):
     def __init__(self,request):
         super().__init__(request);
         self.setReaderStratedy(ProjectParameterReader);
-    """
-    def show(self):
-        uf = RegisterForm();
-        templateObj = loader.get_template("register.html");
-        #fill = dict(list(csrf(self.request.request).items())+list({"form":uf,"title":"Register to system","submitLink":self.submitLink}.items()))
-        fill = {"form":uf,"noajax":True,"title":"Register to system","submitLink":self.submitLink};
-        context= Context(self.request.request,fill);
-        return templateObj.render(context);    
-    """
-    """
     def load(self):
+        contentId = "{}_{}".format(self.parsReader.projectId,self.parsReader.version);
+        from django.shortcuts import get_object_or_404;
+        contentObj = get_object_or_404(ProjectContentLog,pk=contentId);
         import io;
         out = io.BytesIO(contentObj.project_content);
         out.flush();
         out.seek(0);
         from django.core.servers.basehttp import FileWrapper;
         response = HttpResponse(FileWrapper(out),content_type='text/plain');
-        response['Content-Disposition'] = 'attachment; filename=prueba.txt';
+        response['Content-Disposition'] = "attachment; filename={0}.stl".format(contentId);
         return response;
-    """
     def create(self):
         self.checkLogedIn();
         pc = CreateProjectForm(self.request.request.POST,self.request.request.FILES);

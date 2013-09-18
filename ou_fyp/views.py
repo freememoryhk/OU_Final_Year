@@ -4,10 +4,17 @@ from ou_fyp.libs.MyExceptions import *;
 from django.http import HttpRequest,HttpResponse;
 from ou_fyp.libs.ResponseFormats import *;
 from ou_fyp.services.AbstractView import *;
-def testBFLink(request,bar):
+from ou_fyp.libs.Formatter import NumericZeroFormatter;
+def panel(request,pId,version):
     request = RequestDecorator(request);
-    request.addPars("id",bar);
-    return handleRequest(request,"test","hellowould","services");
+    request.addPars("pid",NumericZeroFormatter().format(pId));
+    request.addPars("v",version);
+    return handleRequest(request,"project","controlPanel","templates");
+def loadSTL(request,pId,version):
+    request = RequestDecorator(request);
+    request.addPars("pid",NumericZeroFormatter().format(pId));
+    request.addPars("v",version);
+    return handleRequest(request,"project","load","services");
 def instanceFactoryMethod(request,handler,service,package):
     if package == "services":
         package = "services"

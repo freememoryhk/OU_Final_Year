@@ -9,7 +9,8 @@ from django.contrib.auth.models import User,Group;
 class ProjectParameterReader(AbstractParameterReader):
     def __init__(self,request):
         super().__init__(request);
-        self.projectId = self.request.getParameter("id",acceptNone=True);
+        self.projectId = self.request.getParameter("pid",acceptNone=True);
+        self.version = self.request.getParameter("v",acceptNone=True);
 class ProjectViews(AbstractView):
     def __init__(self,request):
         super().__init__(request);
@@ -20,6 +21,12 @@ class ProjectViews(AbstractView):
         templateObj = loader.get_template("CreateProject.html");
         fill = {"form":pc,"noajax":True,"title":"Content Creation","submitLink":self.submitLink};
         context= Context(self.request.request,fill);
+        return templateObj.render(context);
+    def controlPanel(self):
+        self.checkLogedIn();
+        templateObj = loader.get_template("Panel.html");
+        fill = {"mainSrc":"/services/project/load/16/0","title":"STL Control Panel"};
+        context = Context(self.request.request,fill);
         return templateObj.render(context);
 """
     def show(self):
