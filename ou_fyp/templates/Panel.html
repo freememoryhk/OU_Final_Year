@@ -2,119 +2,83 @@
 {% block content %}
 {% include "PanelInclude.html"%}
 <script>
-var width = window.innerWidth / 2;
+
+var width = window.innerWidth ;
 var height = window.innerHeight / 2;
+//var width = 800;
+//var height = 600;
 var scene ,renderer , camera;
 var container, stats;
-var cameraTarget;
+//var cameraTarget;
+var controls;
+var mainObj ;
 function init()
 {
     container = $('#container');
-    camera = new THREE.PerspectiveCamera( 35, width / height, 1, 15 );
-    camera.position.set( 3, 0.15, 3 );
-    cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+    camera = new THREE.PerspectiveCamera( 45, width / height, 1, 800 );
+    camera.position.set(10,10,10);
+    controls = new THREE.TrackballControls( camera );
+    controls.rotateSpeed = 5.0;
+    controls.zoomSpeed = 5;
+    controls.panSpeed = 2;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
-    
-    // Set Ground
-    var plane = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshPhongMaterial( { ambient: 0x999999, color: 0x999999, specular: 0x101010 } ) );
-    plane.rotation.x = -Math.PI/2;
-    plane.position.y = -0.5;
-    scene.add( plane );
-    plane.receiveShadow = true;
-    // End Set Ground
-    
-    // Load File
-    
+    scene.add( camera );
+    var dirLight = new THREE.DirectionalLight( 0xff0000 );
+    dirLight.position.set( 200, 200, 1000 ).normalize();
+    camera.add( dirLight );
+    camera.add( dirLight.target );
+    var material =  new THREE.MeshPhongMaterial( { ambient: 0xff5533, color: 0xff0000, specular: 0x111111, shininess: 1000 } );
     var loader = new THREE.STLLoader();
     loader.addEventListener( 'load', function ( event ) 
     {
         var geometry = event.content;
-        var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
-        var mesh = new THREE.Mesh( geometry, material );
-        mesh.position.set( -0.5, -0.5, 0 );
-        mesh.rotation.set( - Math.PI / 2, 0, 0 );
-        mesh.scale.set( 0.3, 0.3, 0.3 );
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        scene.add( mesh );
-    } );
+        mainObj = new THREE.Mesh( geometry, material );
+        mainObj.geometry.computeBoundingBox();
+        var box = mainObj.geometry.boundingBox;
+        var centerX = 0.5 * ( box.max.x - box.min.x );
+        var centerY = 0.5 * ( box.max.y - box.min.y );
+        var centerZ = 0.5 * ( box.max.z - box.min.z );
+        camera.position.set(box.max.x *2,box.max.y*2,box.max.z*2);
+        camera.lookAt(new THREE.Vector3(centerX,centerY,centerZ));
+        camera.updateProjectionMatrix();
+        console.log(camera.position);
+        //mesh.position.set(camera.position.x/2,camera.position.y/2,camera.position.z/2);
+        //console.log(mesh.position);
+        //console.log(mesh.scale);
+        //mesh.scale.set(0.5,0.5,0.5);
+        mainObj.castShadow = true;
+        scene.add( mainObj );
+    } 
+    );
     var mainSTLSrc = "{{mainSrc}}";
-    console.log(mainSTLSrc);
-    loader.load(mainSTLSrc);
-    // End Load File
-    
-    // Set Lights
-    
-    scene.add( new THREE.AmbientLight( 0x777777 ) );
-    addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-    addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
-    
-    // End Set Lights
-    
-    // Set Renderer
-    
-    renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+    loader.load( mainSTLSrc );
+    renderer = new THREE.WebGLRenderer( { antialias: false } );
+    renderer.setClearColor( 0xf0f0ff, 1 );
     renderer.setSize( width, height );
-    renderer.setClearColor( scene.fog.color, 1 );
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
-    renderer.physicallyBasedShading = true;
     renderer.shadowMapEnabled = true;
-    renderer.shadowMapCullFace = THREE.CullFaceBack;
+    renderer.shadowMapType = THREE.PCFShadowMap;
     container.append( renderer.domElement );
-
-    // End Set Renderer
-    
-    //Set Stats
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        container.append( stats.domElement );
-    //End Set Stats
-    window.addEventListener( 'resize', onWindowResize, false );
     animate();
 }
 function onWindowResize() 
 {
-    var newWidth = window.innerWidth / 2;
-    var newHeight = window.innerHeight / 2;
-    camera.aspect = newWidth / newHeight;
+    width = window.innerWidth ;
+    height = window.innerHeight / 2; 
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize( newWidth, newHeight );
-}
-function addShadowedLight( x, y, z, color, intensity ) 
-{
-    var directionalLight = new THREE.DirectionalLight( color, intensity );
-    directionalLight.position.set( x, y, z )
-    scene.add( directionalLight );
-    directionalLight.castShadow = true;
-    // directionalLight.shadowCameraVisible = true;
-    var d = 1;
-    directionalLight.shadowCameraLeft = -d;
-    directionalLight.shadowCameraRight = d;
-    directionalLight.shadowCameraTop = d;
-    directionalLight.shadowCameraBottom = -d;
-    directionalLight.shadowCameraNear = 1;
-    directionalLight.shadowCameraFar = 4;
-    directionalLight.shadowMapWidth = 1024;
-    directionalLight.shadowMapHeight = 1024;
-    directionalLight.shadowBias = -0.005;
-    directionalLight.shadowDarkness = 0.15;
+    renderer.setSize( width, height );
+    controls.handleResize();
 }
 function animate() 
 {
     requestAnimationFrame( animate );
-    render();
-    stats.update();
-}
-function render() 
-{
-    var timer = Date.now() * 0.0005;
-    camera.position.x = Math.cos( timer ) * 3;
-    camera.position.z = Math.sin( timer ) * 3;
-    camera.lookAt( cameraTarget );
+    controls.update();
     renderer.render( scene, camera );
+    //stats.update();
 }
 $(document).ready(init);
 </script>
